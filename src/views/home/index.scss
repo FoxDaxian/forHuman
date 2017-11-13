@@ -7,10 +7,44 @@
 				width: 90%;
 			}
 		}
-		.content{
+		.swiper-slide{
+
+		}
+		.contents{
 			width: 90%;
 			margin-left: 50%;
 			transform: translateX(-50%);
+			display: flex;
+			flex-wrap: wrap;
+			.content{
+				width: 50%;
+				position: relative;
+				img{
+					width: 100%;
+					height: 100%;
+				}
+				p{
+					position: absolute;
+					font-size: 18px;
+					bottom: 0;
+					background-color: rgba(#000, .7);
+					width: 100%;
+					line-height: 20px;
+					color: #fff;
+					text-align: left;
+					background-origin: border-box;
+					padding: 20px;
+				}
+			}
+			.spacing{
+				width: 90%;
+				height: 90%;
+				border: 1px solid rgba(#000, .2);
+				background-origin: border-box;
+				margin-left: 50%;
+				margin-top: 50%;
+				transform: translateY(-50%) translateX(-50%);
+			}
 		}
 	}
 }
