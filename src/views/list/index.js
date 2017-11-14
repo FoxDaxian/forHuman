@@ -70,7 +70,7 @@ class List extends Component {
 	}
 
 	render () {
-		console.log(this.state.data)
+		// TODO: 加载动画
 		const renderLists = () => {
 			try {
 				return this.state.data.map((item) => {
