@@ -19,7 +19,8 @@ class List extends Component {
 	}
 	async componentDidMount () {
 		try {
-			const pageTitle = unescape([].slice.call(this.props.location.search, 1).join('').split('&')[1].split('=')[1])
+			// url 中文解码
+			const pageTitle = decodeURI([].slice.call(this.props.location.search, 1).join('').split('&')[1].split('=')[1])
 			const search = [].slice.call(this.props.location.search, 1).join('').split('&')[0].split('=')[1]
 			promiseSetState.call(this, 'pageTitle', pageTitle)
 			const res = await ajax({
@@ -69,12 +70,13 @@ class List extends Component {
 	}
 
 	render () {
+		console.log(this.state.data)
 		const renderLists = () => {
 			try {
 				return this.state.data.map((item) => {
 					return (<Row key={item.ArticleID}>
 						<Col className="gutter-row" span={10}>
-							<img src={item.BigImgName} alt=""/>
+							<img src={item.BigImgName || 'http://img4.imgtn.bdimg.com/it/u=2823434616,1362037498&fm=200&gp=0.jpg'} alt=""/>
 						</Col>
 						<Col className="gutter-row" span={14}>
 							<p className="name">{item.Title}</p>
@@ -88,7 +90,12 @@ class List extends Component {
 		}
 		
 		return (<div className={scss.wrap}>
-			{renderLists()}
+			<div className="content">
+				<p className="title">
+					{this.state.pageTitle}
+				</p>
+				{renderLists()}
+			</div>
 		</div>)
 	}
 }

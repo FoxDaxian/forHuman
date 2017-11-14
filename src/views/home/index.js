@@ -99,7 +99,8 @@ class Home extends Component {
 	}
 	
 	render () {
-		// 使用iScroll，只对第一个子元素起作用，其他的被忽略
+		// 使用iScroll，只对第一个子元素起作用，其他的被忽略\
+		// 还需要css的配合
 		// 注意钩子函数的问题
 		const renderImgs = () => {
 			return this.state.viewData.map((item) => {

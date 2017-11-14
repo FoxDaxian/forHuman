@@ -1,7 +1,28 @@
 .wrap{
 	width: 90%;
 	margin: 0 auto;
+	height: 100vh;
+	overflow: hidden;
+	/* Prevent native touch events on Windows */
+	-ms-touch-action: none;
+	/* Prevent the callout on tap-hold and text selection */
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	/* Prevent text resize on orientation change, useful for web-apps */
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
 	:global{
+		.title{
+			line-height: 80px;
+			font-size: 24px;
+			text-indent: 1em;
+		}
 		.ant-row{
 			margin-bottom: 20px;
 		}
