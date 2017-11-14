@@ -1,14 +1,48 @@
 .wrap{
-	background-color: #FFF;
+	width: 100vw;
+	height: 100vh;
+	// position: relative; // 不加这个postition，就会展示出iscroll自定义的滚动条
+	/* Prevent native touch events on Windows */
+	-ms-touch-action: none;
+
+	/* Prevent the callout on tap-hold and text selection */
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	/* Prevent text resize on orientation change, useful for web-apps */
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
 	:global{
 		.swiper-wrapper{
 			text-align: center;
+			-webkit-tap-highlight-color: rgba(0,0,0,0);
+			/* Put the scroller into the HW Compositing layer right from the start */
+			-webkit-transform: translateZ(0);
+			-moz-transform: translateZ(0);
+			-ms-transform: translateZ(0);
+			-o-transform: translateZ(0);
+			transform: translateZ(0);
 			img{
 				width: 90%;
 			}
 		}
-		.swiper-slide{
-
+		.spinWrap{
+			position: fixed;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100vw;
+			height: 100vh;
+			background-color: #fff;
+		}
+		.ant-spin{
+		    transform: scale(2.5)
 		}
 		.contents{
 			width: 90%;
