@@ -1,5 +1,6 @@
 // states
 
 export const Data = {
-	home: []
+	home: [],
+	articles: {}
 }

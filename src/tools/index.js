@@ -44,6 +44,4 @@ class Tools extends Component {
 	}
 }
 
-const Instance = new Tools()
-export const { promiseSetState, limitLength, lazyLoad } = Instance
-
+export const { promiseSetState, limitLength, lazyLoad } = new Tools()

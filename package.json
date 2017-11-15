@@ -2,6 +2,7 @@
   "name": "react-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "forHuman",
   "proxy": {
     "/api": {
       "target": "http://topic.dps.qikan.com",
