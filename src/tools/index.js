@@ -34,7 +34,8 @@ class Tools extends Component {
 	lazyLoad (img) {
 		return new Promise((resolve, reject) => {
 			let timer = setInterval(() => {
-				if (img.width) {
+				// 根据宽或者高
+				if (img.height) {
 					clearInterval(timer)
 					timer = null
 					resolve(true)

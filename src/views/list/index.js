@@ -62,9 +62,9 @@ class List extends Component {
 				url: '/api/compilation/article/catalog',
 				params: {
 					categorycode: unescape(search),
-					pagesize: 1,
+					pagesize: 20,
 					pageindex: 1,
-					itemcount: 100
+					itemcount: 0
 				}
 			})
 			const { data } = res
@@ -129,7 +129,7 @@ class List extends Component {
 								<img
 									className="img"
 									src={
-										item.BigImgName ||
+										item.SmallImgName ||
 										'http://img4.imgtn.bdimg.com/it/u=2823434616,1362037498&fm=200&gp=0.jpg'
 									}
 									alt=""

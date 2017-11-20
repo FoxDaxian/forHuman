@@ -55,7 +55,6 @@ class Article extends Component {
 					<div className="articleTitle">{data.title}</div>
 					<div className="author">作者：{data.author}</div>
 					<div className="imgBox">
-						<img src={data.img} alt=""/>
 					</div>
 					<div className="content" dangerouslySetInnerHTML={createMarkup()}></div>
 				</div>

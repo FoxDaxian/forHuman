@@ -5,6 +5,8 @@ import { promiseSetState, lazyLoad } from '@/tools'
 import { message, Spin } from 'antd'
 import IScroll from 'iscroll'
 import { Link } from 'react-router-dom'
+import Swiper from 'swiper'
+import 'swiper/dist/css/swiper.min.css'
 
 // store
 import { connect } from 'react-redux'
@@ -32,7 +34,8 @@ class Home extends Component {
 		this.canJump = true
 	}
 
-	jumpList(e) {
+	jumpList(img, e) {
+		console.log(img)
 		if (!this.canJump) {
 			e.preventDefault()
 		}
@@ -58,7 +61,13 @@ class Home extends Component {
 			}
 
 			const tempData = data.Data || data.home
+
 			await promiseSetState.call(this, 'viewData', tempData)
+
+			new Swiper('.swiper-container', {
+				autoplay: true,
+				autoHeight: true
+			})
 
 			const imgs = document.querySelectorAll('img')
 			// promise结果
@@ -67,6 +76,7 @@ class Home extends Component {
 			// 图片加载结果，这里等待promise结果
 			const loadRes = await Promise.all(promises)
 			if (loadRes.every(item => item)) {
+				document.querySelector('.swiper-container').style.height = imgs[0].height + 'px'
 				promiseSetState.call(
 					this,
 					'myScroll',
@@ -105,53 +115,73 @@ class Home extends Component {
 	// 还需要css的配合
 	// 注意钩子函数的问题
 	render() {
-		const renderImgs = () => {
-			return this.state.viewData.map(item => {
-				return (
-					<div
-						className="content"
-						style={{
-							height:
-								typeof this.contents !== 'undefined'
-									? this.contents.offsetWidth / 2
-									: 0 + 'px'
-						}}
-						key={item.MenuCode}
-					>
-						<div className="spacing">
-							<Link
-								to={{
-									pathname: '/list',
-									search: `id=${
-										item.MenuValue.split(':')[1]
-									}&name=${item.MenuName}`
-								}}
-								onClick={this.jumpList.bind(this)}
-							>
-								<img
-									src={
-										item.ImageUrL ||
-										'http://img4.imgtn.bdimg.com/it/u=2823434616,1362037498&fm=200&gp=0.jpg'
-									}
-									alt=""
-								/>
-							</Link>
-							<p>{item.MenuName}</p>
+		let bannerIndex = this.state.viewData.findIndex(item => {
+			return item.MenuValue === 'banner'
+		})
+		const banner = this.state.viewData.slice(bannerIndex, bannerIndex + 1)
+
+		const renderPlay = () => {
+			let res
+			if (banner[0]) {
+				res = banner[0].Children.map(item => {
+					return (
+						<div className="swiper-slide" key={item.MenuCode}>
+							<img src={item.ImageUrl} alt="" />
 						</div>
-					</div>
-				)
-			})
+					)
+				})
+			} else {
+				res = ''
+			}
+			return res
+		}
+
+		const renderImgs = () => {
+			return this.state.viewData
+				.filter(item => item.MenuValue !== 'banner')
+				.map(item => {
+					return (
+						<div
+							className="content"
+							style={{
+								height:
+									typeof this.contents !== 'undefined'
+										? this.contents.offsetWidth / 2
+										: 0 + 'px'
+							}}
+							key={item.MenuCode}
+						>
+							<div className="spacing">
+								<Link
+									to={{
+										pathname: '/list',
+										search: `id=${
+											item.MenuValue.split(':')[1]
+										}&name=${item.MenuName}`
+									}}
+									onClick={this.jumpList.bind(this, item.ImageUrl)}
+								>
+									<img
+										src={
+											item.ImageUrl ||
+											'http://img4.imgtn.bdimg.com/it/u=2823434616,1362037498&fm=200&gp=0.jpg'
+										}
+										alt=""
+									/>
+								</Link>
+								<p>{item.MenuName}</p>
+							</div>
+						</div>
+					)
+				})
 		}
 		return (
-			<div className={scss.wrap + ' swiper-container'}>
-				<div className="swiper-wrapper">
-					<div className="swiper-slide">
-						<img
-							src="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1236117006,3892149680&fm=173&s=0551396CC44EA75556E840920300909B&w=640&h=384&img.JPEG"
-							alt=""
-						/>
+			<div className={scss.wrap}>
+				<div className="innerWrap">
+					<div className="swiper-container">
+						<div className="swiper-wrapper">{renderPlay()}</div>
 					</div>
-					<div className="swiper-slide">
+					<div>
 						<div
 							className="contents"
 							ref={el => (this.contents = el)}
