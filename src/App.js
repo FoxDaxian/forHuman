@@ -12,11 +12,7 @@ class App extends Component {
 				<Router>
 					<div>
 						<Route exact path="/" component={Home} />
-						<Route
-							exact
-							path="/list"
-							component={List}
-						/>
+						<Route exact path="/list" component={List} />
 					</div>
 				</Router>
 			</div>

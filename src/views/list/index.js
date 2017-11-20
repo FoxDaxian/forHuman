@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { catchArticle } from '@/store/actions'
 import { promiseSetState, limitLength, lazyLoad } from '@/tools'
 import { message, Row, Col, Spin } from 'antd'
+import queryString from 'query-string'
 
 // views
 import Article from '@/components/article'
@@ -44,24 +45,14 @@ class List extends Component {
 
 	async componentDidMount() {
 		try {
-			const pageTitle = decodeURI(
-				[].slice
-					.call(this.props.location.search, 1)
-					.join('')
-					.split('&')[1]
-					.split('=')[1]
-			)
-			const search = [].slice
-				.call(this.props.location.search, 1)
-				.join('')
-				.split('&')[0]
-				.split('=')[1]
+			const pageTitle = queryString.parse(this.props.location.search).name
+			const search = queryString.parse(this.props.location.search).id
 			this.pageTitle = pageTitle
 			const res = await ajax({
 				method: 'get',
 				url: '/api/compilation/article/catalog',
 				params: {
-					categorycode: unescape(search),
+					categorycode: search,
 					pagesize: 20,
 					pageindex: 1,
 					itemcount: 0
@@ -123,8 +114,7 @@ class List extends Component {
 							onClick={this.jumpArticle.bind(
 								this,
 								item.ArticleID
-							)}
-						>
+							)}>
 							<Col className="gutter-row" span={6}>
 								<img
 									className="img"
@@ -163,7 +153,11 @@ class List extends Component {
 		return (
 			<div className={scss.wrap}>
 				<div className="content">
-					<p className="title">{this.pageTitle}</p>
+					<p
+						className="title">
+						{this.pageTitle}
+					</p>
+					<img className="titleImg" src={queryString.parse(this.props.location.search).img} alt=""/>
 					{renderLists()}
 				</div>
 				<div
@@ -171,8 +165,7 @@ class List extends Component {
 					style={{
 						display: this.state.toggleSpin ? 'flex' : 'none',
 						zIndex: this.state.myScroll === null ? 10 : -1
-					}}
-				>
+					}}>
 					<Spin size="large" />
 				</div>
 				{renderArticle()}

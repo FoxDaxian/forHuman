@@ -5,7 +5,7 @@ import { promiseSetState, lazyLoad } from '@/tools'
 import { message, Spin } from 'antd'
 import IScroll from 'iscroll'
 import { Link } from 'react-router-dom'
-import Swiper from 'swiper'
+import Swiper from 'swiper/dist/js/swiper.min.js'
 import 'swiper/dist/css/swiper.min.css'
 
 // store
@@ -75,7 +75,8 @@ class Home extends Component {
 			// 图片加载结果，这里等待promise结果
 			const loadRes = await Promise.all(promises)
 			if (loadRes.every(item => item)) {
-				document.querySelector('.swiper-container').style.height = imgs[0].height + 'px'
+				document.querySelector('.swiper-container').style.height =
+					imgs[0].height + 'px'
 				promiseSetState.call(
 					this,
 					'myScroll',
@@ -148,18 +149,18 @@ class Home extends Component {
 										? this.contents.offsetWidth / 2
 										: 0 + 'px'
 							}}
-							key={item.MenuCode}
-						>
+							key={item.MenuCode}>
 							<div className="spacing">
 								<Link
 									to={{
 										pathname: '/list',
 										search: `id=${
 											item.MenuValue.split(':')[1]
-										}&name=${item.MenuName}`
+										}&name=${item.MenuName}&img=${
+											item.ImageUrl
+										}`
 									}}
-									onClick={this.jumpList.bind(this)}
-								>
+									onClick={this.jumpList.bind(this)}>
 									<img
 										src={
 											item.ImageUrl ||
@@ -183,8 +184,7 @@ class Home extends Component {
 					<div>
 						<div
 							className="contents"
-							ref={el => (this.contents = el)}
-						>
+							ref={el => (this.contents = el)}>
 							{renderImgs()}
 						</div>
 					</div>
@@ -195,8 +195,7 @@ class Home extends Component {
 					style={{
 						display: this.state.myScroll === null ? 'flex' : 'none',
 						zIndex: this.state.myScroll === null ? 10 : -1
-					}}
-				>
+					}}>
 					<Spin size="large" />
 				</div>
 			</div>
