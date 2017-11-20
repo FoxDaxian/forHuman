@@ -34,8 +34,7 @@ class Home extends Component {
 		this.canJump = true
 	}
 
-	jumpList(img, e) {
-		console.log(img)
+	jumpList(e) {
 		if (!this.canJump) {
 			e.preventDefault()
 		}
@@ -159,7 +158,7 @@ class Home extends Component {
 											item.MenuValue.split(':')[1]
 										}&name=${item.MenuName}`
 									}}
-									onClick={this.jumpList.bind(this, item.ImageUrl)}
+									onClick={this.jumpList.bind(this)}
 								>
 									<img
 										src={
