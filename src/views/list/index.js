@@ -1,15 +1,17 @@
 import React, { Component } from 'react'
 import scss from './index.scss'
 import ajax from '@/axios'
-import IScroll from 'iscroll'
+import Jroll from 'jroll'
 import { connect } from 'react-redux'
 import { catchArticle } from '@/store/actions'
-import { promiseSetState, limitLength, lazyLoad } from '@/tools'
-import { message, Row, Col, Spin } from 'antd'
+import { promiseSetState } from '@/tools'
+import { message, Row, Col, Spin, Button } from 'antd'
 import queryString from 'query-string'
 
 // views
 import Article from '@/components/article'
+
+import img404 from '@/assets/404.jpg'
 
 const mapStateToProps = state => {
 	return {
@@ -37,17 +39,15 @@ class List extends Component {
 		}
 		this.canJump = true
 		this.pageTitle = ''
+		this.prevPoint = 0
 	}
 
 	async componentWillMount() {
-		promiseSetState.call(this, 'toggleSpin', true)
-	}
-
-	async componentDidMount() {
 		try {
 			const pageTitle = queryString.parse(this.props.location.search).name
 			const search = queryString.parse(this.props.location.search).id
 			this.pageTitle = pageTitle
+			await promiseSetState.call(this, 'toggleSpin', true)
 			const res = await ajax({
 				method: 'get',
 				url: '/api/compilation/article/catalog',
@@ -58,50 +58,41 @@ class List extends Component {
 					itemcount: 0
 				}
 			})
+			window.jsObj && window.jsObj.closeLoading()
 			const { data } = res
 			if (data.Code !== 1) {
 				message.error('请求失败，请重试')
 				return
 			}
 			await promiseSetState.call(this, 'data', data.Data)
+			promiseSetState.call(this, 'toggleSpin', false)
+			await promiseSetState.call(
+				this,
+				'myScroll',
+				new Jroll(`.${scss.wrap}`)
+			)
 
-			const imgs = document.querySelectorAll(`.${scss.wrap} .img`)
+			const self = this
+			this.state.myScroll.on('scrollStart', function() {
+				self.prevPoint = this.y
+			})
 
-			const promises = [].slice.call(imgs).map(el => lazyLoad(el))
+			this.state.myScroll.on('scroll', function() {
+				if (this.y !== self.prevPoint) {
+					if (self.canJump) {
+						self.canJump = false
+					}
+				}
+			})
 
-			const loadRes = await Promise.all(promises)
-
-			// 手势滑动部分
-			if (loadRes.every(item => item)) {
-				promiseSetState.call(
-					this,
-					'myScroll',
-					new IScroll(`.${scss.wrap}`, {
-						scrollbars: true
-					})
-				)
-
-				promiseSetState.call(this, 'toggleSpin', false)
-
-				this.state.myScroll.on('scrollStart', () => {
-					this.canJump = false
-				})
-
-				this.state.myScroll.on('scrollEnd', () => {
-					setTimeout(() => {
-						this.canJump = true
-					}, 0)
-				})
-			} else {
-				message.error('图片加载失败，请重试')
-			}
+			this.state.myScroll.on('scrollEnd', () => {
+				setTimeout(() => {
+					this.canJump = true
+				}, 0)
+			})
 		} catch (error) {
-			message.error(error)
+			console.log(error)
 		}
-	}
-
-	componentWillUnmount() {
-		this.destroyScroll()
 	}
 
 	render() {
@@ -114,22 +105,24 @@ class List extends Component {
 							onClick={this.jumpArticle.bind(
 								this,
 								item.ArticleID
-							)}>
-							<Col className="gutter-row" span={6}>
-								<img
-									className="img"
-									src={
-										item.SmallImgName ||
-										'http://img4.imgtn.bdimg.com/it/u=2823434616,1362037498&fm=200&gp=0.jpg'
-									}
-									alt=""
-								/>
-							</Col>
-							<Col className="gutter-row" span={18}>
+							)}
+							style={{
+								height:
+									typeof this.contents !== 'undefined'
+										? this.contents.offsetWidth / 6 * 3 / 4
+										: 0 + 'px'
+							}}
+						>
+							<Col
+								className="gutter-row"
+								span={4}
+								style={{
+									backgroundImage: `url(${item.SmallImgName ||
+										img404})`
+								}}
+							/>
+							<Col className="gutter-row" span={20}>
 								<p className="name">{item.Title}</p>
-								<p className="summary">
-									{limitLength(item.Summary, 486)}
-								</p>
 							</Col>
 						</Row>
 					)
@@ -152,20 +145,31 @@ class List extends Component {
 
 		return (
 			<div className={scss.wrap}>
-				<div className="content">
-					<p
-						className="title">
-						{this.pageTitle}
+				<div className="content" ref={el => (this.contents = el)}>
+					<p className="title">
+						<span>{this.pageTitle}</span>
+						<Button type="dashed" onClick={this.goBack.bind(this)}>返回</Button>
 					</p>
-					<img className="titleImg" src={queryString.parse(this.props.location.search).img} alt=""/>
+					<div className="titleImg">
+						<div
+							className="glass"
+							style={{
+								backgroundImage: `url(${
+									queryString.parse(
+										this.props.location.search
+									).img
+								})`
+							}}
+						/>
+					</div>
 					{renderLists()}
 				</div>
 				<div
 					className="spinWrap"
 					style={{
-						display: this.state.toggleSpin ? 'flex' : 'none',
-						zIndex: this.state.myScroll === null ? 10 : -1
-					}}>
+						display: this.state.toggleSpin ? 'flex' : 'none'
+					}}
+				>
 					<Spin size="large" />
 				</div>
 				{renderArticle()}
@@ -174,16 +178,20 @@ class List extends Component {
 	}
 
 	async closeArticle() {
+		const self = this
 		promiseSetState.call(this, 'articleData', {})
-		await promiseSetState.call(
-			this,
-			'myScroll',
-			new IScroll(`.${scss.wrap}`, {
-				scrollbars: true
-			})
-		)
-		this.state.myScroll.on('scrollStart', () => {
-			this.canJump = false
+		await promiseSetState.call(this, 'myScroll', new Jroll(`.${scss.wrap}`))
+
+		this.state.myScroll.on('scrollStart', function() {
+			self.prevPoint = this.y
+		})
+
+		this.state.myScroll.on('scroll', function() {
+			if (this.y !== self.prevPoint) {
+				if (self.canJump) {
+					self.canJump = false
+				}
+			}
 		})
 
 		this.state.myScroll.on('scrollEnd', () => {
@@ -193,17 +201,14 @@ class List extends Component {
 		})
 	}
 
-	// 关闭的时候在开启
-	destroyScroll() {
-		this.state.myScroll !== null && this.state.myScroll.destroy()
-		promiseSetState.call(this, 'myScroll', null)
+	goBack () {
+		this.props.history.goBack()
 	}
 
 	async jumpArticle(articleid) {
-		if (!this.canJump || this.state.myScroll === null) {
+		if (!this.canJump) {
 			return
 		}
-		this.destroyScroll()
 		if (this.props.data.articles[articleid]) {
 			promiseSetState.call(
 				this,
@@ -220,14 +225,13 @@ class List extends Component {
 				}
 			})
 			const { data } = res
+			window.jsObj && window.jsObj.closeLoading()
 			promiseSetState.call(this, 'toggleSpin', false)
 			const propsToArticle = {
 				id: data.Data.ArticleID,
 				title: data.Data.Title,
 				author: data.Data.Author || '未知',
-				img:
-					data.Data.BigImgName ||
-					'http://img4.imgtn.bdimg.com/it/u=2823434616,1362037498&fm=200&gp=0.jpg',
+				img: data.Data.BigImgName || img404,
 				content: data.Data.Content
 			}
 			promiseSetState.call(this, 'articleData', propsToArticle)

@@ -3,7 +3,7 @@ import scss from './index.scss'
 import ajax from '@/axios'
 import { promiseSetState, lazyLoad } from '@/tools'
 import { message, Spin } from 'antd'
-import IScroll from 'iscroll'
+import Jroll from 'jroll'
 import { Link } from 'react-router-dom'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import 'swiper/dist/css/swiper.min.css'
@@ -11,6 +11,9 @@ import 'swiper/dist/css/swiper.min.css'
 // store
 import { connect } from 'react-redux'
 import { setHome } from '@/store/actions'
+
+import img404 from '@/assets/404.jpg'
+
 const mapStateToProps = state => {
 	return {
 		data: state.data
@@ -32,6 +35,7 @@ class Home extends Component {
 			myScroll: null
 		}
 		this.canJump = true
+		this.prevPoint = 0
 	}
 
 	jumpList(e) {
@@ -58,6 +62,7 @@ class Home extends Component {
 			} else {
 				data = this.props.data
 			}
+			window.jsObj && window.jsObj.closeLoading()
 
 			const tempData = data.Data || data.home
 
@@ -80,14 +85,22 @@ class Home extends Component {
 				promiseSetState.call(
 					this,
 					'myScroll',
-					new IScroll(`.${scss.wrap}`, {
-						scrollbars: true
-					})
+					new Jroll(`.${scss.wrap}`)
 				)
 
-				this.state.myScroll.on('scrollStart', () => {
-					this.canJump = false
+				const self = this
+				this.state.myScroll.on('scrollStart', function() {
+					self.prevPoint = this.y
 				})
+
+				this.state.myScroll.on('scroll', function() {
+					if (this.y !== self.prevPoint) {
+						if (self.canJump) {
+							self.canJump = false
+						}
+					}
+				})
+
 				this.state.myScroll.on('scrollEnd', () => {
 					setTimeout(() => {
 						this.canJump = true
@@ -111,7 +124,7 @@ class Home extends Component {
 		promiseSetState.call(this, 'myScroll', null)
 	}
 
-	// 使用iScroll，只对第一个子元素起作用，其他的被忽略，第一个啊，记住是第一个
+	// 使用Jroll，只对第一个子元素起作用，其他的被忽略，第一个啊，记住是第一个
 	// 还需要css的配合
 	// 注意钩子函数的问题
 	render() {
@@ -146,31 +159,33 @@ class Home extends Component {
 							style={{
 								height:
 									typeof this.contents !== 'undefined'
-										? this.contents.offsetWidth / 2
+										? this.contents.offsetWidth / 2 * 3 / 4
 										: 0 + 'px'
 							}}
-							key={item.MenuCode}>
-							<div className="spacing">
-								<Link
-									to={{
-										pathname: '/list',
-										search: `id=${
-											item.MenuValue.split(':')[1]
-										}&name=${item.MenuName}&img=${
-											item.ImageUrl
-										}`
+							key={item.MenuCode}
+						>
+							<Link
+								to={{
+									pathname: '/list',
+									search: `id=${
+										item.MenuValue.split(':')[1]
+									}&name=${item.MenuName}&img=${
+										item.ImageUrl
+									}`
+								}}
+								onClick={this.jumpList.bind(this)}
+							>
+								<div
+									className="spacing"
+									style={{
+										backgroundImage: `url(
+										${item.ImageUrl || img404}
+									)`
 									}}
-									onClick={this.jumpList.bind(this)}>
-									<img
-										src={
-											item.ImageUrl ||
-											'http://img4.imgtn.bdimg.com/it/u=2823434616,1362037498&fm=200&gp=0.jpg'
-										}
-										alt=""
-									/>
-								</Link>
-								<p>{item.MenuName}</p>
-							</div>
+								>
+									<p>{item.MenuName}</p>
+								</div>
+							</Link>
 						</div>
 					)
 				})
@@ -184,7 +199,8 @@ class Home extends Component {
 					<div>
 						<div
 							className="contents"
-							ref={el => (this.contents = el)}>
+							ref={el => (this.contents = el)}
+						>
 							{renderImgs()}
 						</div>
 					</div>
@@ -195,7 +211,8 @@ class Home extends Component {
 					style={{
 						display: this.state.myScroll === null ? 'flex' : 'none',
 						zIndex: this.state.myScroll === null ? 10 : -1
-					}}>
+					}}
+				>
 					<Spin size="large" />
 				</div>
 			</div>

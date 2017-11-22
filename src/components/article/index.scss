@@ -1,5 +1,5 @@
 .wrap{
-	background-color: rgba(#000, .3);
+	background-color: rgba(#000, .7);
 	top: 0;
 	left: 0;
 	position: fixed;
@@ -16,7 +16,7 @@
 			background-color: #FFF;
 			box-sizing: border-box;
 			overflow: hidden;
-			padding: 0 20px;
+			padding: 0 40px;
 			.tempBox{
 				box-sizing: border-box;
 				padding: 40px 0 20px 0;
@@ -25,16 +25,17 @@
 				position: absolute;
 				color: rgba(red, .8);
 				right: 10px;
+				top: 10px;
+				font-size: 24px;
 			}
 			.articleTitle{
-				line-height: 24px;
 				font-weight: bold;
 				text-align: center;
-				font-size: 20px;
+				font-size: 40px;
 				margin-bottom: 20px;
 			}
 			.author{
-				font-size: 16px;
+				font-size: 34px;
 				text-align: center;
 				margin-bottom: 20px;
 			}
@@ -45,7 +46,7 @@
 				}
 			}
 			.content{
-
+				font-size: 32px;
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-.wrap{
+.wrap {
 	width: 90%;
 	margin: 0 auto;
 	height: 100vh;
@@ -17,11 +17,11 @@
 	-ms-text-size-adjust: none;
 	-o-text-size-adjust: none;
 	text-size-adjust: none;
-	:global{
-		a{
+	:global {
+		a {
 			color: #000;
 		}
-		.spinWrap{
+		.spinWrap {
 			position: fixed;
 			display: flex;
 			justify-content: center;
@@ -29,50 +29,81 @@
 			width: 100vw;
 			height: 100vh;
 			background-color: #fff;
+			z-index: 1000;
 			top: 0;
 		}
-		.ant-spin{
-		    transform: scale(2.5)
+		.ant-spin {
+			transform: scale(2.5);
 		}
-		.content{
+		.content {
 			position: relative;
 		}
-		.titleImg{
+		.titleImg {
+			height: 300px;
 			width: 100%;
-			margin-bottom: 10px;
-		}
-		.title{
-			color: #fff;
-			position: absolute;
-			font-size: 30px;
-			text-indent: 1em;
-			background-size: cover;
-		}
-		.ant-row{
 			margin-bottom: 20px;
-			height: 250px;
 			position: relative;
-		}
-		.ant-col-6{
-			position: absolute;
-			height: 100%;
-			img{
-				max-height: 100%;
+			.glass {
 				width: 100%;
+				height: 100%;
+				position: absolute;
+				background-size: cover;
+				background-position: 50% 50%;
+				background-repeat: no-repeat;
+				filter: blur(4px);
+				&:after{
+					content: '';
+					position: absolute;
+					width: 100%;
+					height: 100%;
+					background-color: rgba(#000, .3);
+				}
 			}
 		}
-		.ant-col-18{
+		// 遮罩
+		.title {
+			z-index: 10;
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			position: absolute;
+			font-size: 50px;
+			box-sizing: border-box;
+			padding: 0 20px;
+			background-size: cover;
+			color: #fff;
+			.ant-btn-dashed {
+				border: 1px solid #fff;
+				background-color: transparent;
+				color: #fff;
+				border-radius: 4px;
+			}
+		}
+		.ant-row {
+			border-bottom: 20px solid #fff;
+			box-shadow: 0 1px 0 #000;
+			margin-bottom: 20px;
+			position: relative;
+		}
+		.ant-col-4 {
+			position: absolute;
+			height: 100%;
+			background-size: cover;
+			background-position: 50% 50%;
+			background-repeat: no-repeat;
+		}
+		.ant-col-20 {
+			height: 100%;
 			float: right;
 			box-sizing: border-box;
 			padding-left: 10px;
-			.name{
+			display: flex;
+			align-items: center;
+			.name {
 				font-weight: bold;
-				font-size: 16px;
+				font-size: 32px;
 				margin-bottom: 10px;
-			}
-			.summary{
-				font-size: 14px;
-				line-height: 20px;
 			}
 		}
 	}
