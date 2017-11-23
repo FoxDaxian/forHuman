@@ -68,47 +68,45 @@ class Home extends Component {
 
 			await promiseSetState.call(this, 'viewData', tempData)
 
-			new Swiper('.swiper-container', {
-				autoplay: true,
-				autoHeight: true
+			const imgs = document.querySelectorAll('img')
+			if (imgs.length) {
+				// promise结果
+				const promises = [].slice.call(imgs).map(el => lazyLoad(el))
+
+				// 图片加载结果，这里等待promise结果
+				const loadRes = await Promise.all(promises)
+				if (loadRes.every(item => item)) {
+					document.querySelector('.swiper-container').style.height =
+						imgs[0].height + 'px'
+
+					new Swiper('.swiper-container', {
+						autoplay: true,
+						autoHeight: true
+					})
+				} else {
+					message.error('图片加载失败，请重试')
+				}
+			}
+			promiseSetState.call(this, 'myScroll', new Jroll(`.${scss.wrap}`))
+
+			const self = this
+			this.state.myScroll.on('scrollStart', function() {
+				self.prevPoint = this.y
 			})
 
-			const imgs = document.querySelectorAll('img')
-			// promise结果
-			const promises = [].slice.call(imgs).map(el => lazyLoad(el))
-
-			// 图片加载结果，这里等待promise结果
-			const loadRes = await Promise.all(promises)
-			if (loadRes.every(item => item)) {
-				document.querySelector('.swiper-container').style.height =
-					imgs[0].height + 'px'
-				promiseSetState.call(
-					this,
-					'myScroll',
-					new Jroll(`.${scss.wrap}`)
-				)
-
-				const self = this
-				this.state.myScroll.on('scrollStart', function() {
-					self.prevPoint = this.y
-				})
-
-				this.state.myScroll.on('scroll', function() {
-					if (this.y !== self.prevPoint) {
-						if (self.canJump) {
-							self.canJump = false
-						}
+			this.state.myScroll.on('scroll', function() {
+				if (this.y !== self.prevPoint) {
+					if (self.canJump) {
+						self.canJump = false
 					}
-				})
+				}
+			})
 
-				this.state.myScroll.on('scrollEnd', () => {
-					setTimeout(() => {
-						this.canJump = true
-					}, 0)
-				})
-			} else {
-				message.error('图片加载失败，请重试')
-			}
+			this.state.myScroll.on('scrollEnd', () => {
+				setTimeout(() => {
+					this.canJump = true
+				}, 0)
+			})
 		} catch (error) {
 			message.error(error)
 		}
